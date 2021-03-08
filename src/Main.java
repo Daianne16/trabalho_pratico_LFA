@@ -5,11 +5,11 @@ import java.util.stream.Collectors;
 public class Main {
     private static List<Automato> automatos = new ArrayList<>();
     public static void main(String[] args){
-        //Automatos teste 1
+        //Automato-AFD teste
         Automato automato = new Automato();
         automatos.add(preenchendoAutomato(automato));
 
-        //Automato teste 2
+        //Automato-AFD teste 2
         Automato automato2 = new Automato();
         automatos.add(preenchendoAutomato2(automato2));
 
@@ -31,9 +31,13 @@ public class Main {
                 cria_copia_automato(seleciona_automato());
                 System.out.println("\n\tAutomato(s) copiado(s)!");
             }else if(esc == 4){
-
+                verificaEquivEstados(seleciona_automato());
             }else if(esc == 5){
-
+                if(verificaEquivAutomatos(seleciona_automato(),seleciona_automato()) == true){
+                    System.out.println("Os automatos são equivalentes!!");
+                }else{
+                    System.out.println("Os automatos não são equivalentes!!");
+                }
             }else if(esc == 6){
                 Automato aux = minimiza_automato(seleciona_automato());
                 if(Objects.nonNull(aux)){
@@ -391,9 +395,9 @@ public class Main {
             boolean achouRepetido = false;
             for (int j = 0; j < transSemRepeticao.size(); j++) {
                 if (
-                    minimizando.transicoes.get(i).origem.equals(minimizando.transicoes.get(j).origem) &&
-                    minimizando.transicoes.get(i).simbolo.equals(minimizando.transicoes.get(j).simbolo) &&
-                    minimizando.transicoes.get(i).destino.equals(minimizando.transicoes.get(j).destino)
+                    minimizando.transicoes.get(i).origem.equals(transSemRepeticao.get(j).origem) &&
+                    minimizando.transicoes.get(i).simbolo.equals(transSemRepeticao.get(j).simbolo) &&
+                    minimizando.transicoes.get(i).destino.equals(transSemRepeticao.get(j).destino)
                 ){
                     achouRepetido = true;
                     break;
@@ -430,4 +434,95 @@ public class Main {
         return auxList;
     }
 
+    public static void verificaEquivEstados(Automato automato){
+        List<ParVerificacao> listaPares = criaTabelaEquivalencia(automato);
+
+        listaPares = verificaEquivalencia(listaPares, automato);
+
+        for (int i = 0; i < listaPares.size(); i++) {
+            if(listaPares.get(i).statusEquivalencia == 1) {
+                System.out.println("\nOs estados " +listaPares.get(i).estado1+ " e " +listaPares.get(i).estado2+ " não são equivalentes");
+            }else if(listaPares.get(i).statusEquivalencia == 2){
+                    System.out.println("Os estados " +listaPares.get(i).estado1+ " e " +listaPares.get(i).estado2+ " são equivalentes");
+            }
+        }
+    }
+
+    public static boolean verificaEquivAutomatos(Automato automato1, Automato automato2){
+        Automato intermediario = new Automato();
+
+        //passando os estados do automato 1 p/ o intermediario
+        for (int i = 0; i < automato1.estados.size(); i++) {
+            intermediario.estados.add(automato1.estados.get(i));
+        }
+        for (int i = 0; i < automato1.estadoInicial.size(); i++) {
+            intermediario.estadoInicial.add(automato1.estadoInicial.get(i));
+        }
+        for (int i = 0; i < automato1.estadoFinal.size(); i++) {
+            intermediario.estadoFinal.add(automato1.estadoFinal.get(i));
+        }
+        for (int i = 0; i < automato1.transicoes.size(); i++) {
+            intermediario.transicoes.add(automato1.transicoes.get(i));
+        }
+
+        //passando os estados do automato 2 para o intermediario
+        List<List<String>> identidades = new ArrayList<>();//[0] -> nova, [1] -> velha
+        for (int i = 0; i < automato2.estados.size(); i++) {
+            String aux = criaNomeNaoUtilizado(intermediario, automato2.estados.get(i));
+            identidades.add(Arrays.asList(aux, automato2.estados.get(i)));
+            intermediario.estados.add(aux);
+        }
+
+        for (int i = 0; i < automato2.estadoInicial.size(); i++) {
+            for (int j = 0; j < identidades.size(); j++) {
+                if(identidades.get(j).get(1).equals(automato2.estadoInicial.get(i))){
+                    intermediario.estadoInicial.add(identidades.get(j).get(0));
+                    break;
+                }
+            }
+        }
+
+        for (int i = 0; i < automato2.estadoFinal.size(); i++) {
+            for (int j = 0; j < identidades.size(); j++) {
+                if(identidades.get(j).get(1).equals(automato2.estadoFinal.get(i))){
+                    intermediario.estadoFinal.add(identidades.get(j).get(0));
+                    break;
+                }
+            }
+        }
+
+        for (int i = 0; i < automato2.transicoes.size(); i++) {
+            Transicao trans = new Transicao(automato2.transicoes.get(i).origem, automato2.transicoes.get(i).destino, automato2.transicoes.get(i).simbolo);
+            for (int j = 0; j < identidades.size(); j++) {
+                if(identidades.get(j).get(1).equals(trans.origem)){
+                    trans.origem = identidades.get(j).get(0);
+                }
+                if(identidades.get(j).get(1).equals(trans.destino)){
+                    trans.destino = identidades.get(j).get(0);
+                }
+            }
+            intermediario.transicoes.add(trans);
+        }
+
+        List<ParVerificacao> listaPares = criaTabelaEquivalencia(intermediario);
+
+        listaPares = verificaEquivalencia(listaPares, intermediario);
+
+        for (int i = 0; i < listaPares.size(); i++) {
+            if(intermediario.estadoInicial.contains(listaPares.get(i).estado1) && intermediario.estadoInicial.contains(listaPares.get(i).estado2)){
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static String criaNomeNaoUtilizado(Automato automato, String padraoInicial){
+        String aux = padraoInicial;
+
+        while (automato.estados.contains(aux)){
+            aux = aux.concat("-");
+        }
+        return aux;
+    }
 }
