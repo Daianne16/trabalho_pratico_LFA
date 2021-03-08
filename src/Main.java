@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 public class Main {
     private static List<Automato> automatos = new ArrayList<>();
     public static void main(String[] args){
-        //Automato-AFD teste
+        //Automato-AFD teste 1
         Automato automato = new Automato();
         automatos.add(preenchendoAutomato(automato));
 
@@ -13,20 +13,20 @@ public class Main {
         Automato automato2 = new Automato();
         automatos.add(preenchendoAutomato2(automato2));
 
+        //Automato-AFN teste 3
+        Automato automato3 = new Automato();
+        automatos.add(preenchendoAutomato3(automato3));
+
         Scanner ler = new Scanner(System.in);
         int esc = 0;
 
-        while(esc != 7){
+        while(esc != 8){
             menuPrincipal();
             esc = ler.nextInt();
             if(esc == 1){
-                escreve_automato_texto(automato);
-                escreve_automato_texto(automato2);
+                escreve_automato_texto();
             }else if(esc == 2){
-                le_automato_texto(automato);
-                automato.mostraAutomato();
-                le_automato_texto(automato2);
-                automato2.mostraAutomato();
+                le_automato_texto();
             }else if(esc == 3){
                 cria_copia_automato(seleciona_automato());
                 System.out.println("\n\tAutomato(s) copiado(s)!");
@@ -46,7 +46,7 @@ public class Main {
                     System.out.println("Erro!! Não foi possível realizar a minimização o automato!!");
                 }
             }else if(esc == 7){
-
+                multiplicaAutomatos();
             }else if(esc == 8){
                 break;
             }
@@ -74,55 +74,67 @@ public class Main {
         teste.estadoInicial = Collections.singletonList("0");
         teste.estadoFinal = Arrays.asList("0", "4", "5");
 
-        teste.mostraAutomato();
         return teste;
     }
 
     public static Automato preenchendoAutomato2(Automato teste){
 
-        Transicao t1 = new Transicao("0", "1", "b");
-        Transicao t2 = new Transicao("0", "2", "a");
-        Transicao t3 = new Transicao("1", "1", "a");
-        Transicao t4 = new Transicao("1", "0", "b");
-        Transicao t5 = new Transicao("2", "4", "a");
-        Transicao t12 = new Transicao("2", "5", "b");
-        Transicao t6 = new Transicao("3", "4", "b");
-        Transicao t7 = new Transicao("3", "5", "a");
-        Transicao t8 = new Transicao("4", "2", "b");
-        Transicao t9 = new Transicao("4", "5", "a");
-        Transicao t10 = new Transicao("5", "3", "b");
-        Transicao t11 = new Transicao("5", "2", "a");
-        teste.transicoes = Arrays.asList(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12);
+        Transicao t1 = new Transicao("1", "2", "1");
+        Transicao t2 = new Transicao("1", "2", "3");
+        Transicao t3 = new Transicao("1", "3", "2");
+        Transicao t4 = new Transicao("2", "2", "1");
+        Transicao t5 = new Transicao("2", "2", "2");
+        Transicao t6 = new Transicao("2", "2", "3");
+        Transicao t7 = new Transicao("3", "1", "2");
+        Transicao t8 = new Transicao("3", "3", "1");
+        Transicao t9 = new Transicao("3", "3", "3");
+        teste.transicoes = Arrays.asList(t1, t2, t3, t4, t5, t6, t7, t8, t9);
+
+        teste.alfabeto = Arrays.asList("1", "2", "3");
+        teste.estados = Arrays.asList("1", "2", "3");
+        teste.estadoInicial = Collections.singletonList("1");
+        teste.estadoFinal = Arrays.asList("3");
+
+        return teste;
+    }
+
+    public static Automato preenchendoAutomato3(Automato teste){
+
+        Transicao t0 = new Transicao("0", "0", "b");
+        Transicao t1 = new Transicao("0", "1", "a");
+        Transicao t2 = new Transicao("0", "3", "a");
+        Transicao t3 = new Transicao("1", "2", "b");
+        Transicao t4 = new Transicao("1", "3", "a");
+        Transicao t5 = new Transicao("2", "3", "b");
+        Transicao t6 = new Transicao("3", "3", "a");
+        teste.transicoes = Arrays.asList(t0,t1, t2, t3, t4, t5, t6);
 
         teste.alfabeto = Arrays.asList("a", "b");
-        teste.estados = Arrays.asList("0", "1", "2", "3", "4", "5");
+        teste.estados = Arrays.asList("0", "1", "2", "3", "4");
         teste.estadoInicial = Collections.singletonList("0");
-        teste.estadoFinal = Arrays.asList("0", "4", "5");
-
-
-        //System.out.println(teste.verificaCadeia(Arrays.asList("b","a","a","a","a","b"), "0"));
-        //System.out.println(teste.verificaCadeia(Arrays.asList("b","a","a","a","a"), "0"));
+        teste.estadoFinal = Arrays.asList("1", "3");
 
         return teste;
     }
 
     public static void menuPrincipal(){
         System.out.println("\n\t-------------MENU------------");
-        System.out.println("1. Salvar automato em um arquivo de texto;");
-        System.out.println("2. Carregar automato de um arquivo de texto;");
-        System.out.println("3. Criar uma cópia do automato;");
-        System.out.println("4. Calcular estados equivalentes;");
-        System.out.println("5. Testar equivalencia entre 2 AFDs;");
-        System.out.println("6. Calcular automato minimizado para um AFD fornecido;");
-        System.out.println("7. Sair.");
+        System.out.println("\t1. Salvar automato em um arquivo de texto;");
+        System.out.println("\t2. Carregar automato de um arquivo de texto;");
+        System.out.println("\t3. Criar uma cópia do automato;");
+        System.out.println("\t4. Calcular estados equivalentes;");
+        System.out.println("\t5. Testar equivalencia entre 2 AFDs;");
+        System.out.println("\t6. Calcular automato minimizado para um AFD fornecido;");
+        System.out.println("\t7. Multiplicação entre AFDs e Operações de conjunto com AFDs;");
+        System.out.println("\t8. Sair.");
         System.out.println("\n\tSua escolha: ");
 
     }
 
-    public static void escreve_automato_texto(Automato automato){
+    public static void escreve_automato_texto(){
         for (int i = 0; i < automatos.size(); i++) {
             try {
-                Arquivo_Servico.escreve_arquivo("C:\\Users\\polo\\Desktop\\p_4\\LFA\\trabalho_pratico\\automatos_salvos_em_texto\\automato"+(i+1)+".txt", automato);
+                Arquivo_Servico.escreve_arquivo("C:\\Users\\polo\\Desktop\\p_4\\LFA\\trabalho_pratico\\automatos_salvos_em_texto\\automato"+(i+1)+".txt", automatos.get(i));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -130,11 +142,13 @@ public class Main {
         System.out.println(" AFD salvo em um arquivo de texto!");
     }
 
-    public static void le_automato_texto(Automato automato){
-        System.out.println("\n\t-----------Automato carregado do arquivo de texto: --------------\n");
+    public static void le_automato_texto(){
+        System.out.println("\n\t-----------Automatos carregado do arquivo de texto: --------------\n");
         for (int i = 0; i < automatos.size(); i++) {
+            System.out.println("AUTOMATO ("+(i+1)+")");
             try {
-                automato = Arquivo_Servico.le_arquivo("C:\\Users\\polo\\Desktop\\p_4\\LFA\\trabalho_pratico\\automatos_salvos_em_texto\\automato"+(i+1)+".txt");
+                Arquivo_Servico.le_arquivo("C:\\Users\\polo\\Desktop\\p_4\\LFA\\trabalho_pratico\\automatos_salvos_em_texto\\automato"+(i+1)+".txt").mostraAutomato();
+                System.out.println("\n\n-----------------------------------");
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -468,7 +482,7 @@ public class Main {
         //passando os estados do automato 2 para o intermediario
         List<List<String>> identidades = new ArrayList<>();//[0] -> nova, [1] -> velha
         for (int i = 0; i < automato2.estados.size(); i++) {
-            String aux = criaNomeNaoUtilizado(intermediario, automato2.estados.get(i));
+            String aux = Automato_Servico.criaNomeNaoUtilizado(intermediario, automato2.estados.get(i));
             identidades.add(Arrays.asList(aux, automato2.estados.get(i)));
             intermediario.estados.add(aux);
         }
@@ -517,12 +531,18 @@ public class Main {
         return false;
     }
 
-    public static String criaNomeNaoUtilizado(Automato automato, String padraoInicial){
-        String aux = padraoInicial;
+    public static void multiplicaAutomatos(){
+        Automato automato1 = seleciona_automato();
+        Automato automato2 = seleciona_automato();
+        Scanner ler = new Scanner(System.in);
 
-        while (automato.estados.contains(aux)){
-            aux = aux.concat("-");
-        }
-        return aux;
+        System.out.println("\n\t------Menu Operações Conjuntos------");
+        System.out.println("1. União;");
+        System.out.println("2. Intercessão;");
+        System.out.println("3. Diferença;");
+        System.out.println("4. Complemento;");
+        System.out.println("\n\tSua escolha: ");
+
+        Automato_Servico.multiplica(automato1, automato2, ler.nextInt()).mostraAutomato();
     }
 }
