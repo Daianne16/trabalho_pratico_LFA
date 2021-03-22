@@ -17,10 +17,18 @@ public class Main {
         Automato automato3 = new Automato();
         automatos.add(preenchendoAutomato3(automato3));
 
+        //Automato-AFN-Vazio teste 4
+        Automato automato4 = new Automato();
+        automatos.add(preenchendoAutomato4(automato4));
+
+        //Automato-AFN-Vazio teste 4
+        Automato automato5 = new Automato();
+        automatos.add(preenchendoAutomato5(automato5));
+
         Scanner ler = new Scanner(System.in);
         int esc = 0;
 
-        while(esc != 8){
+        while(esc != 10){
             menuPrincipal();
             esc = ler.nextInt();
             if(esc == 1){
@@ -28,7 +36,7 @@ public class Main {
             }else if(esc == 2){
                 le_automato_texto();
             }else if(esc == 3){
-                cria_copia_automato(seleciona_automato());
+                Automato_Servico.cria_copia_automato(seleciona_automato());
                 System.out.println("\n\tAutomato(s) copiado(s)!");
             }else if(esc == 4){
                 verificaEquivEstados(seleciona_automato());
@@ -47,12 +55,18 @@ public class Main {
                 }
             }else if(esc == 7){
                 multiplicaAutomatos();
-            }else if(esc == 8){
+            }else if(esc == 8) {
+                Automato_Servico.retiraTransicoesVazias(seleciona_automato()).mostraAutomato();
+            }else if(esc == 9) {
+                System.out.println("Nessa opção poderá selecionar o AFN-Vazio e o algoritmo fará todo o processo de conversão");
+                Automato_Servico.removeNaoDeterminismo(seleciona_automato()).mostraAutomato();
+            }else if(esc == 10){
                 break;
             }
         }
     }
 
+    //AFD
     public static Automato preenchendoAutomato(Automato teste){
 
         Transicao t1 = new Transicao("0", "1", "b");
@@ -76,7 +90,7 @@ public class Main {
 
         return teste;
     }
-
+    //AFD
     public static Automato preenchendoAutomato2(Automato teste){
 
         Transicao t1 = new Transicao("1", "2", "1");
@@ -97,7 +111,7 @@ public class Main {
 
         return teste;
     }
-
+    //AFN
     public static Automato preenchendoAutomato3(Automato teste){
 
         Transicao t0 = new Transicao("0", "0", "b");
@@ -116,6 +130,41 @@ public class Main {
 
         return teste;
     }
+    //AFN-Vazio
+    public static Automato preenchendoAutomato4(Automato teste){
+        //$ = movimento vazio;
+        Transicao t0 = new Transicao("0","1", "$");
+        Transicao t1 = new Transicao("0", "2", "a");
+        Transicao t2 = new Transicao("1", "1", "a");
+        Transicao t3 = new Transicao("1","3",  "b");
+        Transicao t4 = new Transicao("2", "1", "c");
+        Transicao t5 = new Transicao("2", "2", "b");
+        Transicao t6 = new Transicao("2", "3", "$");
+        Transicao t7 = new Transicao("3", "3", "c");
+        teste.transicoes = Arrays.asList(t0, t1, t2, t3, t4, t5, t6, t7);
+
+        teste.alfabeto = Arrays.asList("a", "b", "c", "$");
+        teste.estados = Arrays.asList("0", "1", "2", "3");
+        teste.estadoInicial = Collections.singletonList("0");
+        teste.estadoFinal = Arrays.asList("3");
+
+        return teste;
+    }
+    //AFN
+    public static Automato preenchendoAutomato5(Automato teste){
+        //$ = movimento vazio;
+        Transicao t0 = new Transicao("1","3", "a");
+        Transicao t1 = new Transicao("2", "3", "b");
+        Transicao t2 = new Transicao("3", "2", "a");
+        teste.transicoes = Arrays.asList(t0, t1, t2);
+
+        teste.alfabeto = Arrays.asList("a", "b");
+        teste.estados = Arrays.asList("1", "2", "3");
+        teste.estadoInicial =Arrays.asList("1", "2", "3");
+        teste.estadoFinal = Arrays.asList("3");
+
+        return teste;
+    }
 
     public static void menuPrincipal(){
         System.out.println("\n\t-------------MENU------------");
@@ -126,7 +175,9 @@ public class Main {
         System.out.println("\t5. Testar equivalencia entre 2 AFDs;");
         System.out.println("\t6. Calcular automato minimizado para um AFD fornecido;");
         System.out.println("\t7. Multiplicação entre AFDs e Operações de conjunto com AFDs;");
-        System.out.println("\t8. Sair.");
+        System.out.println("\t8. Eliminar movimentos vazios no AFN;");
+        System.out.println("\t9. Eliminar o não-determinismo no AFN;");
+        System.out.println("\t10. Sair.");
         System.out.println("\n\tSua escolha: ");
 
     }
@@ -160,6 +211,8 @@ public class Main {
         int esc = -1;
         Scanner ler = new Scanner(System.in);
 
+        System.out.println("\n\tLembre-se: \nautomato (1) = AFD; \nautomato (2) = AFD; \nautomato (3): AFN; \nautomato (4) = AFN-Vazio\nautomato (5) = AFN\n");
+        System.out.println("---------Opções: \n");
         for (int i = 0; i < automatos.size(); i++) {
             System.out.println((i+1) + " " + automatos.get(i).estados);
         }
@@ -171,36 +224,6 @@ public class Main {
         }
 
         return automatos.get(esc-1);
-    }
-
-    public static Automato cria_copia_automato(Automato automato){
-        Automato copia_automato = new Automato();
-
-        for (int i = 0; i < automato.alfabeto.size(); i++) {
-            copia_automato.alfabeto.add(automato.alfabeto.get(i));
-        }
-        for (int i = 0; i < automato.estados.size(); i++) {
-            copia_automato.estados.add(automato.estados.get(i));
-        }
-        for (int i = 0; i < automato.estadoInicial.size(); i++) {
-            copia_automato.estadoInicial.add(automato.estadoInicial.get(i));
-        }
-        for (int i = 0; i < automato.estadoFinal.size(); i++) {
-            copia_automato.estadoFinal.add(automato.estadoFinal.get(i));
-        }
-
-        for (int i = 0; i < automato.transicoes.size(); i++) {
-            Transicao trans = new Transicao(automato.transicoes.get(i).origem,automato.transicoes.get(i).destino, automato.transicoes.get(i).simbolo );
-            copia_automato.transicoes.add(trans);
-        }
-
-        try {
-            Arquivo_Servico.escreve_arquivo("C:\\Users\\polo\\Desktop\\p_4\\LFA\\trabalho_pratico\\automatos_salvos_em_texto\\copia_automato.txt", copia_automato);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return  copia_automato;
     }
 
     public static Automato minimiza_automato(Automato automato){
@@ -545,4 +568,5 @@ public class Main {
 
         Automato_Servico.multiplica(automato1, automato2, ler.nextInt()).mostraAutomato();
     }
+
 }

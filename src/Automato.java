@@ -99,7 +99,6 @@ public class Automato {
             }
         }
 
-
         return false;
     }
 
@@ -201,6 +200,16 @@ public class Automato {
             Transicao trans = transicoes.get(i);
             System.out.println("\t(origem:  " + trans.origem + ", simbolo: " + trans.simbolo + " )= destino: " + trans.destino);
         }
+    }
+
+    public boolean verificaTrasicaoVazia(){
+
+        for (int i = 0; i < this.transicoes.size(); i++) {
+            if(this.transicoes.get(i).simbolo.equals(Automato_Servico.valorVazio)){
+                return true;
+            }
+        }
+        return false;
     }
 
 }
