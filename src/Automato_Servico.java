@@ -4,38 +4,49 @@ import java.util.stream.Collectors;
 public class Automato_Servico {
     public static String valorVazio = "$";
 
+    //funcao recursiva para multiplicar dois automatos
     public static Automato multiplica(Automato automato1, Automato automato2, int operador){
         Automato resultante = new Automato();
         List<List<String>> identidades = new ArrayList<>();
 
+       //adiciona todos os caracteres do alfabeto do automato 1 para o resultante
         resultante.alfabeto.addAll(automato1.alfabeto);
+        //se o vetor resultante não contém algum caracter do alfabeto do automato 2, ele é adicionado;
         for (int i = 0; i < automato2.alfabeto.size(); i++) {
             if(!resultante.alfabeto.contains(automato2.alfabeto.get(i))){
                 resultante.alfabeto.add(automato2.alfabeto.get(i));
             }
         }
 
+        //multiplica estado por estado
         multiplicaEstados(identidades, automato1, automato2, resultante,operador);
 
+        //transicao por tansicao
         multiplicaTransicoes(identidades,automato1,automato2,resultante);
 
         return resultante;
     }
 
+    //multiplica estados de dois automatos
     public static void multiplicaEstados(List<List<String>> identidades,Automato automato1, Automato automato2,
                                          Automato resultante, int operador){
 
         for (int i = 0; i < automato1.estados.size(); i++) {
             for (int j = 0; j < automato2.estados.size(); j++) {
+                //nome para o estado multiplicado
                 String estado = criaNomeNaoUtilizado(resultante, automato1.estados.get(i)+"."+ automato2.estados.get(j));
                 identidades.add(Arrays.asList(estado, automato1.estados.get(i), automato2.estados.get(j))); //0 -> resultante; 1 -> original automato1; 2 -> original automato2;
 
+                //adiciona os novos estados no vetor resultante
                 resultante.estados.add(estado);
 
+                //se o estado que está sendo analizado do aut 1 e do aut 2 são estados iniciais
+                //add  o estado que contem os dois estados iniciais
                 if(automato1.estadoInicial.contains(automato1.estados.get(i)) && automato2.estadoInicial.contains(automato2.estados.get(j))){
                     resultante.estadoInicial.add(estado);
                 }
 
+                //adiciona todos os estados novos, que contem os finais do aut 1 ou do aut 2
                 if(operador == 1){
                     if(automato1.estadoFinal.contains(automato1.estados.get(i)) || automato2.estadoFinal.contains(automato2.estados.get(j))){
                         resultante.estadoFinal.add(estado);
@@ -58,15 +69,18 @@ public class Automato_Servico {
 
     }
 
+    //cria nomes para estado morto
     public static String criaNomeNaoUtilizado(Automato automato, String padraoInicial){
         String aux = padraoInicial;
 
+        //nome para estado morto e estado novo;
         while (automato.estados.contains(aux)){
             aux = aux.concat("-");
         }
         return aux;
     }
 
+    //cria nome para novos estados
     public static String criaNomeNaoUtilizado(List<String> estados, String padraoInicial){
         String aux = padraoInicial;
 
@@ -76,6 +90,7 @@ public class Automato_Servico {
         return aux;
     }
 
+    //multiplica transicoes de 2 automatos
     public static void multiplicaTransicoes(List<List<String>> identidades,Automato automato1, Automato automato2,
                                             Automato resultante){
 
@@ -84,6 +99,8 @@ public class Automato_Servico {
                 Transicao trans1 = null;
                 Transicao trans2 = null;
 
+                //identidade -> aramzena quem gerou cada transicao
+                //transicoes do automato 1
                 for (int k = 0; k < automato1.transicoes.size(); k++) {
                     if(identidades.get(i).get(1).equals(automato1.transicoes.get(k).origem) &&
                             automato1.transicoes.get(k).simbolo.equals(resultante.alfabeto.get(j))
@@ -92,6 +109,8 @@ public class Automato_Servico {
                         break;
                     }
                 }
+
+                //transicoes automato 2
                 for (int k = 0; k < automato2.transicoes.size(); k++) {
                     if(identidades.get(i).get(2).equals(automato2.transicoes.get(k).origem) &&
                             automato2.transicoes.get(k).simbolo.equals(resultante.alfabeto.get(j))
@@ -123,6 +142,7 @@ public class Automato_Servico {
 
     }
 
+    //cria copia do automato selecionado
     public static Automato cria_copia_automato(Automato automato){
         Automato copia_automato = new Automato();
 
@@ -153,6 +173,7 @@ public class Automato_Servico {
         return  copia_automato;
     }
 
+    //monta tabelas com origem, fecho vazio, alfabeto e fecho vazio
     public static Automato retiraTransicoesVazias(Automato automato){
         //tabela = origem = estados, fechoVazio = transicoes vazias, alfabeto = estados chegada alfabeto
         // e fechoVazio2 = transicoes vazias, baseadas nos estados do alfabeto ( englobam o estado
@@ -324,6 +345,7 @@ public class Automato_Servico {
         return afd;
     }
 
+    //retira estados repetidos, com o mesmo nome;
     public static List<String> removeRepeticoes(List<String> estadosRepetidos){
 
         List<String> semRepeticao = new ArrayList<>();
@@ -335,6 +357,7 @@ public class Automato_Servico {
         return semRepeticao;
     }
 
+    //verifica se existe trans repetida no automato;
     public static boolean possuiTransicaoRepetida(List<Transicao> trans, Transicao transicao){
         for (Transicao transicaoAtual : trans) {
             if(transicaoAtual.origem.equals(transicao.origem) && transicaoAtual.destino.equals(transicao.destino) &&
@@ -345,8 +368,10 @@ public class Automato_Servico {
         return false;
     }
 
+    //cria uma copia do automato sleecionado pelo usuario
     public static Automato copiaAutomato(Automato automato){
 
+        //verifica qual foi o aut selecionado, cria copia e retorna;
         Automato automato1 = new Automato();
 
         for (String letras : automato.alfabeto) { automato1.alfabeto.add(letras); }
@@ -383,6 +408,7 @@ public class Automato_Servico {
         return -1;
     }
 
+    //verifica se o estado final é igual a identidade criada, após remover o n determinismo;
     public static boolean possuiEstadoFinal(List<String> finais, List<String> identidades){
 
         for (int i = 0; i < finais.size(); i++) {
@@ -395,6 +421,7 @@ public class Automato_Servico {
         return false;
     }
 
+    //adiciona estado para completar
     public static Automato completaAutomato(Automato automato){
         Automato autCompleto = copiaAutomato(automato);
         String estadoMorto = criaNomeNaoUtilizado(autCompleto, "estadoMorto");

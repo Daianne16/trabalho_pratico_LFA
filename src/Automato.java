@@ -106,6 +106,7 @@ public class Automato {
         List<Integer> conts = new ArrayList<>();
         int contador = 0;
 
+        //verifica se a origem está dentro dos estados e se a transicao tem o simbolo igual ao do alfabeto
         for (int i = 0; i < this.estados.size(); i++) {
             for (int j = 0; j < this.alfabeto.size(); j++) {
                 for (int k = 0; k < this.transicoes.size(); k++) {
@@ -128,12 +129,17 @@ public class Automato {
         return true;
     }
 
+    //estados que a partir de uma origem n é possivel alcanca-los
+    //automato completo
     public boolean verificaEstadosInacessiveis(){
+
         List<String> estadosAlcancados = new ArrayList<>();
+        //verifica se o estado inial já foi visitado
         for (int i = 0; i < this.estadoInicial.size(); i++) {
             verificaEstadosInacessiveis(estadosAlcancados, estadoInicial.get(i));
         }
 
+        //se os estadosAlcancados não contem o estado na posicao;
         for (int i = 0; i < this.estados.size(); i++) {
             if(!estadosAlcancados.contains(estados.get(i))){
                 return true;
@@ -147,6 +153,7 @@ public class Automato {
         estadosAlcancados.add(estadoAtual);
         Boolean estadoMorto = true;
 
+        //origem que não tem destino (o destino é um estado morto);
         for (int i = 0; i < this.transicoes.size(); i++) {
             if (this.transicoes.get(i).origem.equals(estadoAtual) && !this.transicoes.get(i).destino.equals(estadoAtual)) {
                 estadoMorto = false;
@@ -156,6 +163,8 @@ public class Automato {
 
         if (estadoMorto == true) { return; }
 
+        //verifica se a origem existe, se o destino não é igual ao da transicaos e destino ainda não foi olhado.
+        //roda a funcao para procurar o destino que ainda n foi olhado
         for (int i = 0; i < this.transicoes.size(); i++) {
             if(transicoes.get(i).origem.equals(estadoAtual) && !transicoes.get(i).destino.equals(estadoAtual)
                     && !estadosAlcancados.contains(transicoes.get(i).destino)){
@@ -164,12 +173,14 @@ public class Automato {
         }
     }
 
+    //verifica se o automato é afn ou não
     public boolean verificaAFN(){
 
         if(estadoInicial.size() != 1){
             return true;
         }
 
+        //verifica se tem mais de uma uma transicao saindo do mesmo estado com o mesmo simbolo;
         for (int i = 0; i < estados.size(); i++) {
             for (int j = 0; j < alfabeto.size(); j++) {
                 int cont = 0;
@@ -202,8 +213,10 @@ public class Automato {
         }
     }
 
+    //verifica se o automato possui transicoes vazias
     public boolean verificaTrasicaoVazia(){
 
+        //verifica se dentro das transicoes tem alguma saindo com valor vazio;
         for (int i = 0; i < this.transicoes.size(); i++) {
             if(this.transicoes.get(i).simbolo.equals(Automato_Servico.valorVazio)){
                 return true;

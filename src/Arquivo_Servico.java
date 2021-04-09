@@ -10,9 +10,10 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
-import java.util.List;
 
 public class Arquivo_Servico {
+
+    //escreve o alfabeto, os estados, estado inicial, estados finais e as transicoes.
     public static void escreve_arquivo (String caminho, Automato automato) throws Exception{
         DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder documentBuilder = documentFactory.newDocumentBuilder();
@@ -75,6 +76,7 @@ public class Arquivo_Servico {
         transformer.transform(domSource, streamResult);
     }
 
+    //lê o alfabeto, os estados, estado inicial, estados finais e as transicoes.
     public static Automato le_arquivo(String caminho) throws Exception{
         Automato retorno = new Automato();
 
@@ -144,8 +146,4 @@ public class Arquivo_Servico {
 
         return retorno;
     }
-
-    public static void cria_copia_arquivo(){}
-
-    public static void exclui_arquivo(Automato automato){}
 }

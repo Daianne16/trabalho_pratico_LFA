@@ -8,6 +8,8 @@ public class ParVerificacao {
     String estado2;
     List<ParVerificacao> dependencias = new ArrayList<>();
 
+    //verifica transicoes entre dois estados e monta o par, para definir se o aut é equivalente ou não
+    //verifica se os automatos aceitam a mesma linguagem
     public void efetuaVerificacao(List<ParVerificacao> pares, Automato automato){
         for (int i = 0; i < automato.alfabeto.size(); i++) {
             Transicao trans1 = null;

@@ -1,6 +1,4 @@
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
 
 public class Main {
     private static List<Automato> automatos = new ArrayList<>();
@@ -21,9 +19,12 @@ public class Main {
         Automato automato4 = new Automato();
         automatos.add(preenchendoAutomato4(automato4));
 
-        //Automato-AFN-Vazio teste 4
+        //Automato-AFN teste 5
         Automato automato5 = new Automato();
         automatos.add(preenchendoAutomato5(automato5));
+
+        Automato automato6 = new Automato();
+        automatos.add(teste(automato6));
 
         Scanner ler = new Scanner(System.in);
         int esc = 0;
@@ -32,21 +33,27 @@ public class Main {
             menuPrincipal();
             esc = ler.nextInt();
             if(esc == 1){
+                //escreve todas
                 escreve_automato_texto();
             }else if(esc == 2){
+                //le todos
                 le_automato_texto();
             }else if(esc == 3){
+                //cria copia do selecionado
                 Automato_Servico.cria_copia_automato(seleciona_automato());
                 System.out.println("\n\tAutomato(s) copiado(s)!");
             }else if(esc == 4){
+                //equivalencia entre estados
                 verificaEquivEstados(seleciona_automato());
             }else if(esc == 5){
+                //equivalencia entre automatos
                 if(verificaEquivAutomatos(seleciona_automato(),seleciona_automato()) == true){
                     System.out.println("Os automatos são equivalentes!!");
                 }else{
                     System.out.println("Os automatos não são equivalentes!!");
                 }
             }else if(esc == 6){
+                //minimizacao
                 Automato aux = minimiza_automato(seleciona_automato());
                 if(Objects.nonNull(aux)){
                     aux.mostraAutomato();
@@ -54,8 +61,10 @@ public class Main {
                     System.out.println("Erro!! Não foi possível realizar a minimização o automato!!");
                 }
             }else if(esc == 7){
+                //multiplica automato
                 multiplicaAutomatos();
             }else if(esc == 8) {
+                //elimina transicoes vazias
                 Automato_Servico.retiraTransicoesVazias(seleciona_automato()).mostraAutomato();
             }else if(esc == 9) {
                 System.out.println("Nessa opção poderá selecionar o AFN-Vazio e o algoritmo fará todo o processo de conversão");
@@ -124,7 +133,7 @@ public class Main {
         teste.transicoes = Arrays.asList(t0,t1, t2, t3, t4, t5, t6);
 
         teste.alfabeto = Arrays.asList("a", "b");
-        teste.estados = Arrays.asList("0", "1", "2", "3", "4");
+        teste.estados = Arrays.asList("0", "1", "2", "3");
         teste.estadoInicial = Collections.singletonList("0");
         teste.estadoFinal = Arrays.asList("1", "3");
 
@@ -152,7 +161,6 @@ public class Main {
     }
     //AFN
     public static Automato preenchendoAutomato5(Automato teste){
-        //$ = movimento vazio;
         Transicao t0 = new Transicao("1","3", "a");
         Transicao t1 = new Transicao("2", "3", "b");
         Transicao t2 = new Transicao("3", "2", "a");
@@ -166,6 +174,27 @@ public class Main {
         return teste;
     }
 
+    public static Automato teste(Automato teste){
+        Transicao t0 = new Transicao("0","0", "a");
+        Transicao t1 = new Transicao("0","0", "b");
+        Transicao t2 = new Transicao("0","1", "a");
+        Transicao t3 = new Transicao("1", "2", "a");
+        Transicao t4 = new Transicao("1", "2", "b");
+        Transicao t5 = new Transicao("2", "3", "a");
+        Transicao t6 = new Transicao("2", "3", "b");
+        Transicao t7 = new Transicao("3", "4", "a");
+        Transicao t8 = new Transicao("3", "4", "b");
+        Transicao t9= new Transicao("4", "5", "a");
+        Transicao t10 = new Transicao("4", "5", "b");
+        teste.transicoes = Arrays.asList(t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10);
+
+        teste.alfabeto = Arrays.asList("a", "b");
+        teste.estados = Arrays.asList("0", "1", "2", "3", "4", "5");
+        teste.estadoInicial =Arrays.asList("1");
+        teste.estadoFinal = Arrays.asList("5");
+
+        return teste;
+    }
     public static void menuPrincipal(){
         System.out.println("\n\t-------------MENU------------");
         System.out.println("\t1. Salvar automato em um arquivo de texto;");
@@ -182,6 +211,7 @@ public class Main {
 
     }
 
+    //escreve todos os preenchidos
     public static void escreve_automato_texto(){
         for (int i = 0; i < automatos.size(); i++) {
             try {
@@ -193,8 +223,9 @@ public class Main {
         System.out.println(" AFD salvo em um arquivo de texto!");
     }
 
+    //lê todos os preenchidos e escritos no arquivo de texto;
     public static void le_automato_texto(){
-        System.out.println("\n\t-----------Automatos carregado do arquivo de texto: --------------\n");
+        System.out.println("\n\t-----------Automatos carregados do arquivo de texto: --------------\n");
         for (int i = 0; i < automatos.size(); i++) {
             System.out.println("AUTOMATO ("+(i+1)+")");
             try {
@@ -226,6 +257,7 @@ public class Main {
         return automatos.get(esc-1);
     }
 
+    //verifica se é completo, verifica a equivalencia dos estados e minimiza;
     public static Automato minimiza_automato(Automato automato){
         if(automato.estados.size() >= 2 && !automato.verificaEstadosInacessiveis() && automato.verificaAutomatoCompleto() && !automato.verificaAFN()){
             List<ParVerificacao> listaPares = criaTabelaEquivalencia(automato);
@@ -239,6 +271,7 @@ public class Main {
 
         return null;
     }
+
 
     public static List<ParVerificacao> criaTabelaEquivalencia(Automato automato){
         List<ParVerificacao> vetor = new ArrayList<>();
@@ -267,6 +300,7 @@ public class Main {
         while(true){
             boolean aux = false;
             for (int i = 0; i < verificacoes.size(); i++) {
+                //statusEquivalencia = 0 -> n julgado
                 if(verificacoes.get(i).statusEquivalencia == 0){
                     aux = true;
                     break;
@@ -471,6 +505,8 @@ public class Main {
         return auxList;
     }
 
+    //verifica se estados sao equivalentes
+    //se fazem a mesma coisa
     public static void verificaEquivEstados(Automato automato){
         List<ParVerificacao> listaPares = criaTabelaEquivalencia(automato);
 
@@ -485,6 +521,7 @@ public class Main {
         }
     }
 
+    //equivalencia entre dois automatos
     public static boolean verificaEquivAutomatos(Automato automato1, Automato automato2){
         Automato intermediario = new Automato();
 
@@ -554,16 +591,17 @@ public class Main {
         return false;
     }
 
+    //multiplica dois automatos;
     public static void multiplicaAutomatos(){
         Automato automato1 = seleciona_automato();
         Automato automato2 = seleciona_automato();
         Scanner ler = new Scanner(System.in);
 
         System.out.println("\n\t------Menu Operações Conjuntos------");
-        System.out.println("1. União;");
-        System.out.println("2. Intercessão;");
-        System.out.println("3. Diferença;");
-        System.out.println("4. Complemento;");
+        System.out.println("1. União;"); //resultante terá todos os estados, transicoes e alfabeto dos dois automatos
+        System.out.println("2. Intercessão;"); //resultante terá apensas o que tem nos dois
+        System.out.println("3. Diferença;"); //resultante terá apenas o que não tem nos dois
+        System.out.println("4. Complemento;"); //os q são finais passam a ser n finais e vice versa;
         System.out.println("\n\tSua escolha: ");
 
         Automato_Servico.multiplica(automato1, automato2, ler.nextInt()).mostraAutomato();
